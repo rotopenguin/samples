@@ -107,9 +107,22 @@ void loop()
   static float lastKnobAngle, knob;
   static byte blink;
   unsigned long time = millis();
-  
-  // Blink the indicator LED now and then
-  digitalWrite(DPIN_GLED, (time&0x03FF)?LOW:HIGH);
+  int chargeState;
+   
+  // Check the state of the charge controller
+  chargeState = analogRead(APIN_CHARGE);
+  if (chargeState < 128) // Low - charging
+  {
+    digitalWrite(DPIN_GLED, (time&0x0100)?LOW:HIGH);
+  }
+  else if (chargeState > 768) // High - charged
+  {
+    digitalWrite(DPIN_GLED, HIGH);
+  }
+  else // Hi-Z - shutdown
+  {
+    digitalWrite(DPIN_GLED, LOW);
+  }
 
   // Check the serial port
   if (Serial.available())
